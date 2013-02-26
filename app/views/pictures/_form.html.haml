@@ -1,0 +1,20 @@
+%h3 输入信息
+
+= form_tag "/match", :class=>"form-horizontal" do
+  .control-group
+    .control-label
+      = label_tag :url
+    .controls
+      = text_field_tag :url, @url, :class=>"input-xxlarge"
+
+  .control-group
+    .control-label
+      = label_tag :title
+    .controls
+      = text_field_tag :title, @title, :class=>"input-xxlarge"
+
+  .control-group
+    .controls
+      = submit_tag "提交", :class=>"btn btn-info"
+      %a.btn.btn-info#reset-button 重置
+

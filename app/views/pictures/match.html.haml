@@ -1,0 +1,34 @@
+#bd_snap
+  #bd_snap_txt
+    .container
+      = render "layouts/flash_messages"
+
+      = render 'form'
+
+      .row
+        .span4
+          %h3 配图结果
+          = image_tag @match_oss
+          .clearfix
+            %strong 命中的Key:
+            = @match_key
+        .span8
+          %h3 调试信息
+          %table.table.table-striped
+            %tr
+              %th key
+              %th oss
+              %th picture
+      
+            - @redis_kv.each do |item|
+              %tr
+                %td= item[0]
+                %td= item[1]
+                %td
+                  = image_tag "http://recimg.cdn.aliyuncs.com/#{item[1]}", :width=>"32"
+
+#bd_snap_ln
+
+%div{:style=>"position:relative"}
+  = @page.html_safe
+

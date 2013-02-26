@@ -1,0 +1,37 @@
+$iconSpritePath: image-path('glyphicons-halflings.png');
+$iconWhiteSpritePath: image-path('glyphicons-halflings-white.png');
+
+@import "bootstrap";
+@import "bootstrap-responsive";
+
+/* Body and structure
+-------------------------------------------------- */
+
+body {
+	position:relative;
+}
+
+.navbar-without-bottom {
+  margin-bottom: 0 !important;
+}
+
+#bd_snap {
+	font:14px arial;
+	color:#000;
+	background:#fff;
+	text-align:left;
+	padding:7px 0 0 20px;
+}
+
+#bd_snap_txt {
+	clear:both;
+	padding:10px 0;
+}
+
+#bd_snap_ln {
+	height:1px;
+	border-top:1px solid #aca899;
+	background:#ece9d8;
+	overflow:hidden;
+}
+

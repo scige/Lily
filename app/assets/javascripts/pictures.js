@@ -1,0 +1,12 @@
+$(function(){
+  $("#reset-button").click(function(){
+    $("#url").val("");
+    $("#title").val("");
+  });
+
+  $("#url").click(function(){
+    $("#url").val("");
+    $("#title").val("");
+  });
+});
+
