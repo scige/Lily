@@ -8,5 +8,10 @@ $(function(){
     $("#url").val("");
     $("#title").val("");
   });
+
+  $("body").click(function(){
+    //alert("hello");
+    $("#dialog").dialog();
+  });
 });
 

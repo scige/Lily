@@ -16,6 +16,8 @@ class PicturesController < ApplicationController
         @page = Iconv.conv('UTF-8//IGNORE', 'GB2312//IGNORE', @page)
       elsif @page.index("charset=gbk")
         @page = Iconv.conv('UTF-8//IGNORE', 'GBK//IGNORE', @page)
+      else
+        @page = Iconv.conv('UTF-8//IGNORE', 'UTF-8//IGNORE', @page)
       end
 
       if !@title or @title.empty?
