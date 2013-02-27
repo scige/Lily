@@ -1,4 +1,5 @@
 # coding: utf-8
+require 'iconv'
 
 class PicturesController < ApplicationController
   def index
@@ -8,12 +9,23 @@ class PicturesController < ApplicationController
   def match
     @url = params[:url]
     @title = params[:title]
+    #binding.pry
     begin
       @page = RestClient.get @url
+      if @page.index("charset=gb2312")
+        @page = Iconv.conv('UTF-8//IGNORE', 'GB2312//IGNORE', @page)
+      elsif @page.index("charset=gbk")
+        @page = Iconv.conv('UTF-8//IGNORE', 'GBK//IGNORE', @page)
+      end
+
       if !@title or @title.empty?
         @page =~ /<[Tt]itle>.*?<\/[Tt]itle>/
         html_title = $&
         @title = html_title[7, html_title.length-15]
+
+        #pos_begin = @page.index("<title>")
+        #pos_end = @page.index("</title>")
+        #@title = @page[pos_begin+7...pos_end]
       end
     rescue
       flash[:error] = "自动获取网页标题失败，请手动输入网页标题。"
@@ -23,7 +35,8 @@ class PicturesController < ApplicationController
     end
 
     command = "cd get_keywords/ && LD_LIBRARY_PATH=./ && ./get_keywords -s \"#{@title}\""
-    words_array = `#{command}`.chop.split
+    words_string = `#{command}`
+    words_array = words_string.chop.split
 
     redis = Redis.new
     @redis_kv = []
