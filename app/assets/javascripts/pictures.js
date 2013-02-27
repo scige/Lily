@@ -9,9 +9,12 @@ $(function(){
     $("#title").val("");
   });
 
-  $("body").click(function(){
-    //alert("hello");
-    $("#dialog").dialog();
+  $("td img").mouseover(function(e){
+    $(e.target).attr("width", "128");
+  });
+
+  $("td img").mouseout(function(e){
+    $(e.target).attr("width", "32");
   });
 });
 

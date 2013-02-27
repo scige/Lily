@@ -6,19 +6,19 @@
       = render 'form'
 
       .row
-        .span4
+        .span3
           %h3 配图结果
           = image_tag @match_oss
           .clearfix
             %strong 命中的Key:
             = @match_key
-        .span6
+        .span7
           %h3 调试信息
           %table.table.table-striped
             %tr
-              %th key
-              %th oss
-              %th picture
+              %th{:width=>200} key
+              %th{:width=>400} oss
+              %th{:width=>200} picture
       
             - @redis_kv.each do |item|
               %tr
@@ -31,7 +31,4 @@
 
 %div{:style=>"position:relative"}
   = @page.html_safe
-
-%div#dialog{:title=>"Basic dialog"}
-  %p This is the default dialog which is useful for displaying information. The dialog window can be moved, resized and closed with the 'x' icon.
 
