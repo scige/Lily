@@ -12,13 +12,8 @@ class PicturesController < ApplicationController
     #binding.pry
     begin
       @page = RestClient.get @url
-      if @page.index("charset=gb2312") or @page.index("charset=GB2312") or @page.index("charset=\"gb2312\"") or @page.index("charset=\"GB2312\"")
-        @page = Iconv.conv('UTF-8//IGNORE', 'GB2312//IGNORE', @page)
-      elsif @page.index("charset=gbk") or @page.index("charset=GBK") or @page.index("charset=\"gbk\"") or @page.index("charset=\"GBK\"")
-        @page = Iconv.conv('UTF-8//IGNORE', 'GBK//IGNORE', @page)
-      else
-        @page = Iconv.conv('UTF-8//IGNORE', 'UTF-8//IGNORE', @page)
-      end
+      charset = get_charset(@page)
+      @page = Iconv.conv('UTF-8//IGNORE', charset, @page)
 
       if !@title or @title.empty?
         @page =~ /<[Tt]itle>.*?<\/[Tt]itle>/
@@ -30,7 +25,7 @@ class PicturesController < ApplicationController
         #@title = @page[pos_begin+7...pos_end]
       end
     rescue
-      flash[:error] = "自动获取网页标题失败，请手动输入网页标题。"
+      flash.now[:error] = "自动获取网页标题失败，请手动输入网页标题。"
       @title = ""
       @page = ""
       #redirect_to root_url and return
@@ -87,5 +82,21 @@ class PicturesController < ApplicationController
         break
       end
     end
+  end
+
+  def get_charset(page)
+      if @page.index("charset=gb2312") or
+         @page.index("charset=GB2312") or
+         @page.index("charset=\"gb2312\"") or
+         @page.index("charset=\"GB2312\"")
+        'GB2312//IGNORE'
+      elsif @page.index("charset=gbk") or
+            @page.index("charset=GBK") or
+            @page.index("charset=\"gbk\"") or
+            @page.index("charset=\"GBK\"")
+        'GBK//IGNORE'
+      else
+        'UTF-8//IGNORE'
+      end
   end
 end
