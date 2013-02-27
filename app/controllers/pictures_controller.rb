@@ -12,9 +12,9 @@ class PicturesController < ApplicationController
     #binding.pry
     begin
       @page = RestClient.get @url
-      if @page.index("charset=gb2312")
+      if @page.index("charset=gb2312") or @page.index("charset=GB2312") or @page.index("charset=\"gb2312\"") or @page.index("charset=\"GB2312\"")
         @page = Iconv.conv('UTF-8//IGNORE', 'GB2312//IGNORE', @page)
-      elsif @page.index("charset=gbk")
+      elsif @page.index("charset=gbk") or @page.index("charset=GBK") or @page.index("charset=\"gbk\"") or @page.index("charset=\"GBK\"")
         @page = Iconv.conv('UTF-8//IGNORE', 'GBK//IGNORE', @page)
       else
         @page = Iconv.conv('UTF-8//IGNORE', 'UTF-8//IGNORE', @page)
