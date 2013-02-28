@@ -16,13 +16,12 @@ class PicturesController < ApplicationController
       @page = Iconv.conv('UTF-8//IGNORE', charset, @page)
 
       if !@title or @title.empty?
-        @page =~ /<[Tt]itle>.*?<\/[Tt]itle>/
-        html_title = $&
-        @title = html_title[7, html_title.length-15]
+        @title = RestClient.post "http://10.230.225.18:4567/", :url=>@url
+        @title = Iconv.conv('UTF-8//IGNORE', 'UTF-8//IGNORE', @title)
+      end
 
-        #pos_begin = @page.index("<title>")
-        #pos_end = @page.index("</title>")
-        #@title = @page[pos_begin+7...pos_end]
+      if !@title or @title.empty?
+        @title = get_title(@page)
       end
     rescue
       flash.now[:error] = "自动获取网页标题失败，请手动输入网页标题。"
@@ -85,18 +84,32 @@ class PicturesController < ApplicationController
   end
 
   def get_charset(page)
-      if @page.index("charset=gb2312") or
-         @page.index("charset=GB2312") or
-         @page.index("charset=\"gb2312\"") or
-         @page.index("charset=\"GB2312\"")
-        'GB2312//IGNORE'
-      elsif @page.index("charset=gbk") or
-            @page.index("charset=GBK") or
-            @page.index("charset=\"gbk\"") or
-            @page.index("charset=\"GBK\"")
-        'GBK//IGNORE'
-      else
-        'UTF-8//IGNORE'
-      end
+    pos_body = page.index("<body")
+    head = page[0...pos_body]
+    if head.index("charset=gb2312") or
+       head.index("charset=GB2312") or
+       head.index("charset=\"gb2312\"") or
+       head.index("charset=\"GB2312\"")
+      'GB2312//IGNORE'
+    elsif head.index("charset=gbk") or
+          head.index("charset=GBK") or
+          head.index("charset=\"gbk\"") or
+          head.index("charset=\"GBK\"")
+      'GBK//IGNORE'
+    else
+      'UTF-8//IGNORE'
+    end
+  end
+
+  def get_title(page)
+    page =~ /<[Tt]itle.*?>.*?<\/[Tt]itle>/
+    html_title = $&
+    pos_begin = html_title.index(">")
+    pos_end = html_title.index("</")
+    html_title[pos_begin+1...pos_end]
+
+    #pos_begin = page.index("<title>")
+    #pos_end = page.index("</title>")
+    #page[pos_begin+7...pos_end]
   end
 end
