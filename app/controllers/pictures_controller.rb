@@ -16,14 +16,17 @@ class PicturesController < ApplicationController
       charset = get_charset(@page)
       @page = Iconv.conv('UTF-8//IGNORE', charset, @page)
 
-      if !@title or @title.empty?
-        @title = RestClient.post "http://10.230.225.18:4567/", :url=>@url
-        @title = Iconv.conv('UTF-8//IGNORE', 'UTF-8//IGNORE', @title)
+      @article_title = RestClient.post "http://10.230.225.18:4567/", :url=>@url
+      @article_title = Iconv.conv('UTF-8//IGNORE', 'UTF-8//IGNORE', @article_title)
+
+      @html_title = get_title(@page)
+
+      if @article_title and !@article_title.empty?
+        @title = @article_title
+      elsif @html_title and !@html_title.empty?
+        @title = @html_title
       end
 
-      if !@title or @title.empty?
-        @title = get_title(@page)
-      end
     rescue
       flash.now[:error] = "自动获取网页标题失败，请手动输入网页标题。"
       @title = ""
@@ -35,6 +38,8 @@ class PicturesController < ApplicationController
     words_string = `#{command}`
     words_array = words_string.chop.split
 
+    @aliguess_keywords = words_array.join("  ")
+
     redis = Redis.new
     @redis_kv = []
 
@@ -43,6 +48,8 @@ class PicturesController < ApplicationController
     words_array.delete_if do |word|
       word.length <= 1 or word.bytesize <= 3
     end
+
+    @valid_keywords = words_array.join("  ")
 
     if words_array.length == 3
       redis_key = words_array.join(" ")
@@ -117,9 +124,13 @@ class PicturesController < ApplicationController
   end
 
   def get_domain(url)
-    pos_begin = url.index('//')
-    pos_end = url.index('/', pos_begin+2)
-    host = url[pos_begin+2...pos_end]
-    host.split('.')[-2..-1].join('.')
+    begin
+      pos_begin = url.index('//')
+      pos_end = url.index('/', pos_begin+2)
+      host = url[pos_begin+2...pos_end]
+      host.split('.')[-2..-1].join('.')
+    rescue
+      return ""
+    end
   end
 end
