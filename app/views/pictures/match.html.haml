@@ -7,9 +7,8 @@
 
       .row
         .span3
-          %h3
-            %i.icon-chevron-right
-            配图结果
+          .lily-block-title
+            %h3 配图结果
           = image_tag @match_oss, :class=>"img-polaroid"
           .clearfix
             %br
@@ -18,7 +17,8 @@
               - @match_key.split(' ').each do |word|
                 %span.label.label-important= word
         .span7
-          %h3 候选图片
+          .lily-block-title
+            %h3 候选图片
           %table.table.table-striped
             %tr
               %th{:width=>200} key
@@ -39,7 +39,8 @@
                 %td
                   = image_tag "http://recimg.cdn.aliyuncs.com/#{item[1]}", :width=>"32"
 
-          %h3 调试信息
+          .lily-block-title
+            %h3 调试信息
           %table.table.table-striped
             %tr
               %td{:width=>100}
