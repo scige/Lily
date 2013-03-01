@@ -7,7 +7,7 @@ class PicturesController < ApplicationController
   end
 
   def match
-    @url = params[:url]
+    @url = normalize(params[:url])
     @title = params[:title]
     @domain = get_domain(@url)
     #binding.pry
@@ -38,7 +38,7 @@ class PicturesController < ApplicationController
     words_string = `#{command}`
     words_array = words_string.chop.split
 
-    @aliguess_keywords = words_array.join("  ")
+    @aliguess_keywords = words_array.dup
 
     redis = Redis.new
     @redis_kv = []
@@ -49,7 +49,7 @@ class PicturesController < ApplicationController
       word.length <= 1 or word.bytesize <= 3
     end
 
-    @valid_keywords = words_array.join("  ")
+    @valid_keywords = words_array.dup
 
     if words_array.length == 3
       redis_key = words_array.join(" ")
@@ -94,8 +94,13 @@ class PicturesController < ApplicationController
   private
 
   def get_charset(page)
+    #binding.pry
     pos_body = page.index("<body")
-    head = page[0...pos_body]
+    if pos_body
+      head = page[0...pos_body]
+    else
+      head = page
+    end
     if head.index("charset=gb2312") or
        head.index("charset=GB2312") or
        head.index("charset=\"gb2312\"") or
@@ -112,15 +117,36 @@ class PicturesController < ApplicationController
   end
 
   def get_title(page)
+    #binding.pry
     page =~ /<[Tt]itle.*?>.*?<\/[Tt]itle>/
     html_title = $&
+    if !html_title
+      return ""
+    end
     pos_begin = html_title.index(">")
     pos_end = html_title.index("</")
-    html_title[pos_begin+1...pos_end]
+    if pos_begin and pos_end
+      html_title[pos_begin+1...pos_end]
+    else
+      ""
+    end
 
     #pos_begin = page.index("<title>")
     #pos_end = page.index("</title>")
     #page[pos_begin+7...pos_end]
+  end
+
+  def normalize(url)
+    normalized_url = url
+    if !url.index("http://")
+      normalized_url = "http://" + url
+    end
+    pos_begin = normalized_url.index('//')
+    pos_end = normalized_url.index('/', pos_begin+2)
+    if !pos_end
+      normalized_url += "/"
+    end
+    return normalized_url
   end
 
   def get_domain(url)
@@ -128,7 +154,11 @@ class PicturesController < ApplicationController
       pos_begin = url.index('//')
       pos_end = url.index('/', pos_begin+2)
       host = url[pos_begin+2...pos_end]
-      host.split('.')[-2..-1].join('.')
+      domain = host.split('.')[-2..-1].join('.')
+      if domain == "com.cn"
+        domain = host.split('.')[-3..-1].join('.')
+      end
+      return domain
     rescue
       return ""
     end

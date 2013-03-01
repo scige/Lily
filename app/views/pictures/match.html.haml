@@ -7,11 +7,16 @@
 
       .row
         .span3
-          %h3 配图结果
-          = image_tag @match_oss
+          %h3
+            %i.icon-chevron-right
+            配图结果
+          = image_tag @match_oss, :class=>"img-polaroid"
           .clearfix
+            %br
             %strong 命中的Key:
-            = @match_key
+            - if @match_key
+              - @match_key.split(' ').each do |word|
+                %span.label.label-important= word
         .span7
           %h3 候选图片
           %table.table.table-striped
@@ -22,7 +27,14 @@
       
             - @redis_kv.each do |item|
               %tr
-                %td= item[0]
+                %td 
+                  - if item[0]
+                    - if item[0] == @match_key
+                      - item[0].split(' ').each do |word|
+                        %span.label.label-important= word
+                    - else
+                      - item[0].split(' ').each do |word|
+                        %span.label.label-success= word
                 %td= item[1]
                 %td
                   = image_tag "http://recimg.cdn.aliyuncs.com/#{item[1]}", :width=>"32"
@@ -52,11 +64,15 @@
             %tr
               %td{:width=>100}
                 %strong Aliguess_Keywords
-              %td= @aliguess_keywords
+              %td
+                - @aliguess_keywords.each do |word|
+                  %span.label.label-info= word
             %tr
               %td{:width=>100}
                 %strong Valid_Keywords
-              %td= @valid_keywords
+              %td
+                - @valid_keywords.each do |word|
+                  %span.label.label-info= word
 
 #bd_snap_ln
 
