@@ -8,7 +8,7 @@ class PicturesController < ApplicationController
 
   def match
     @url = normalize(params[:url])
-    @title = params[:title]
+    @input_title = params[:title]
     @domain = get_domain(@url)
     #binding.pry
     begin
@@ -22,19 +22,21 @@ class PicturesController < ApplicationController
       @html_title = get_title(@page)
 
       if @article_title and !@article_title.empty?
-        @title = @article_title
+        @aliguess_title = @article_title
       elsif @html_title and !@html_title.empty?
-        @title = @html_title
+        @aliguess_title = @html_title
+      else
+        @aliguess_title = @input_title
       end
 
     rescue
       flash.now[:error] = "自动获取网页标题失败，请手动输入网页标题。"
-      @title = ""
+      @aliguess_title = ""
       @page = ""
       #redirect_to root_url and return
     end
 
-    command = "cd get_keywords/ && LD_LIBRARY_PATH=./ && ./get_keywords -s \"#{@title}\" \"#{@domain}\""
+    command = "cd get_keywords/ && LD_LIBRARY_PATH=./ && ./get_keywords -s \"#{@aliguess_title}\" \"#{@domain}\""
     words_string = `#{command}`
     words_array = words_string.chop.split
 
