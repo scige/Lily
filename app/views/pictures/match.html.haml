@@ -13,7 +13,7 @@
             %strong 命中的Key:
             = @match_key
         .span7
-          %h3 调试信息
+          %h3 候选图片
           %table.table.table-striped
             %tr
               %th{:width=>200} key
@@ -26,6 +26,29 @@
                 %td= item[1]
                 %td
                   = image_tag "http://recimg.cdn.aliyuncs.com/#{item[1]}", :width=>"32"
+
+          %h3 调试信息
+          %table.table.table-striped
+            %tr
+              %td{:width=>100}
+                %strong Url
+              %td= @url
+            %tr
+              %td{:width=>100}
+                %strong Domain
+              %td= @domain
+            %tr
+              %td{:width=>100}
+                %strong Title
+              %td= @title
+            %tr
+              %td{:width=>100}
+                %strong Article_Title
+              %td= @title
+            %tr
+              %td{:width=>100}
+                %strong Aliguess
+              %td= @title
 
 #bd_snap_ln
 

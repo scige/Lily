@@ -3,12 +3,13 @@ require 'iconv'
 
 class PicturesController < ApplicationController
   def index
-    @url = @title = ""
+    @url = ""
   end
 
   def match
     @url = params[:url]
     @title = params[:title]
+    @domain = get_domain(@url)
     #binding.pry
     begin
       @page = RestClient.get @url
@@ -30,7 +31,7 @@ class PicturesController < ApplicationController
       #redirect_to root_url and return
     end
 
-    command = "cd get_keywords/ && LD_LIBRARY_PATH=./ && ./get_keywords -s \"#{@title}\""
+    command = "cd get_keywords/ && LD_LIBRARY_PATH=./ && ./get_keywords -s \"#{@title}\" \"#{@domain}\""
     words_string = `#{command}`
     words_array = words_string.chop.split
 
@@ -83,6 +84,8 @@ class PicturesController < ApplicationController
     end
   end
 
+  private
+
   def get_charset(page)
     pos_body = page.index("<body")
     head = page[0...pos_body]
@@ -111,5 +114,12 @@ class PicturesController < ApplicationController
     #pos_begin = page.index("<title>")
     #pos_end = page.index("</title>")
     #page[pos_begin+7...pos_end]
+  end
+
+  def get_domain(url)
+    pos_begin = url.index('//')
+    pos_end = url.index('/', pos_begin+2)
+    host = url[pos_begin+2...pos_end]
+    host.split('.')[-2..-1].join('.')
   end
 end
