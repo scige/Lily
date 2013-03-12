@@ -31,7 +31,7 @@ class PicturesController < ApplicationController
 
     rescue
       flash.now[:error] = "自动获取网页标题失败，请手动输入网页标题。"
-      @use_title = ""
+      @use_title = @input_title if @input_title and !@input_title.empty?
       @page = ""
       #redirect_to root_url and return
     end
