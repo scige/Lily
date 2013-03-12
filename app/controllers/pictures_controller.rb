@@ -36,11 +36,10 @@ class PicturesController < ApplicationController
       #redirect_to root_url and return
     end
 
-    command = "LD_LIBRARY_PATH=./get_result_filter/ ./get_result_filter/get_resultfilter -s \"#{@use_title}\" \"#{@domain}\""
+    command = "cd ./get_result_filter/ && LD_LIBRARY_PATH=./ ./get_resultfilter -s \"#{@use_title}\" \"#{@domain}\""
     @trim_title = `#{command}`.chop
-    #@trim_title = `LD_LIBRARY_PATH=./get_result_filter/ ./get_result_filter/get_resultfilter 2>&1`
 
-    command = "LD_LIBRARY_PATH=./get_keywords/ ./get_keywords/get_keywords -s \"#{@trim_title}\" \"#{@domain}\""
+    command = "cd ./get_keywords/ && LD_LIBRARY_PATH=./ ./get_keywords -s \"#{@trim_title}\" \"#{@domain}\""
     words_string = `#{command}`
     words_array = words_string.chop.split
 
