@@ -93,6 +93,7 @@ class PicturesController < ApplicationController
     end
 
     @oss_url = ""
+    @match_oss = "default.jpg"
     @redis_kv.each do |item|
       if item[1]
         @match_key = item[0]
