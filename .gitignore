@@ -14,3 +14,4 @@
 /log/*.log
 /tmp
 /get_keywords
+/get_result_filter

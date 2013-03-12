@@ -22,21 +22,24 @@ class PicturesController < ApplicationController
       @html_title = get_title(@page)
 
       if @article_title and !@article_title.empty?
-        @aliguess_title = @article_title
+        @use_title = @article_title
       elsif @html_title and !@html_title.empty?
-        @aliguess_title = @html_title
+        @use_title = @html_title
       else
-        @aliguess_title = @input_title
+        @use_title = @input_title
       end
 
     rescue
       flash.now[:error] = "自动获取网页标题失败，请手动输入网页标题。"
-      @aliguess_title = ""
+      @use_title = ""
       @page = ""
       #redirect_to root_url and return
     end
 
-    command = "cd get_keywords/ && LD_LIBRARY_PATH=./ && ./get_keywords -s \"#{@aliguess_title}\" \"#{@domain}\""
+    command = "cd get_result_filter/ && LD_LIBRARY_PATH=./ && ./get_resultfilter -s \"#{@use_title}\" \"#{@domain}\""
+    @trim_title = `#{command}`.chop
+
+    command = "cd get_keywords/ && LD_LIBRARY_PATH=./ && ./get_keywords -s \"#{@trim_title}\" \"#{@domain}\""
     words_string = `#{command}`
     words_array = words_string.chop.split
 
@@ -45,11 +48,17 @@ class PicturesController < ApplicationController
     redis = Redis.new
     @redis_kv = []
 
-    words_array.sort!
+    # 按字母序排序
+    #words_array.sort!
 
-    words_array.delete_if do |word|
-      word.length <= 1 or word.bytesize <= 3
+    # 按词的长度排序
+    words_array.sort! do |left, right|
+      right.length <=> left.length
     end
+
+    #words_array.delete_if do |word|
+    #  word.length <= 1 or word.bytesize <= 3
+    #end
 
     @valid_keywords = words_array.dup
 
