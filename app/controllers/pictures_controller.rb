@@ -35,9 +35,18 @@ class PicturesController < ApplicationController
 
   def batch_match
     @urls = params[:urls].strip.split("\r\n")
+    @urls.delete_if do |url|
+      url.empty?
+    end
+
     @batch_match_array = []
     @urls.each do |url|
       temp_hash = @url_keywords_hash[url]
+      if !temp_hash
+        result_hash = {:url=>url, :title=>"", :aliguess_keywords=>[], :valid_keywords=>[], :match_key=>"", :match_oss=>"default.jpg"}
+        @batch_match_array << result_hash
+        next
+      end
       result_hash = {:url=>url, :title=>temp_hash[:title]}
 
       words_array = temp_hash[:keywords].split

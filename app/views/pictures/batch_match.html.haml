@@ -5,11 +5,17 @@
 
       = render 'surfer_form'
 
+      .row
+        .span3
+          .lily-block-title
+            %h3 配图结果
+        .span7
+          .lily-block-title
+            %h3 调试信息
+
       - @batch_match_array.each do |item|
-        .row
+        .row.item-border
           .span3
-            .lily-block-title
-              %h3 配图结果
             = image_tag item[:match_oss], :class=>"img-polaroid"
             .clearfix
               %br
@@ -18,13 +24,11 @@
                 - item[:match_key].split(' ').each do |word|
                   %span.label.label-important= word
           .span7
-            .lily-block-title
-              %h3 调试信息
             %table.table.table-striped
               %tr
                 %td{:width=>100}
                   %strong Url
-                %td= item[:url]
+                %td= link_to item[:url], item[:url], :target=>"_blank"
               %tr
                 %td{:width=>100}
                   %strong Trim_Title
