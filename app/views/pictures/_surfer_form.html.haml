@@ -1,0 +1,15 @@
+.lily-block-title
+  %h3 输入信息
+
+= form_tag "/batch_match", :class=>"form-horizontal" do
+  .control-group
+    .control-label
+      = label_tag :urls
+    .controls
+      = text_area_tag :urls, nil, :rows=>10, :class=>"input-xxlarge"
+
+  .control-group
+    .controls
+      = submit_tag "提交", :class=>"btn btn-info"
+      %a.btn.btn-info#reset-button 重置
+

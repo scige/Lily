@@ -1,0 +1,44 @@
+#bd_snap
+  #bd_snap_txt
+    .container
+      = render "layouts/flash_messages"
+
+      = render 'surfer_form'
+
+      - @batch_match_array.each do |item|
+        .row
+          .span3
+            .lily-block-title
+              %h3 配图结果
+            = image_tag item[:match_oss], :class=>"img-polaroid"
+            .clearfix
+              %br
+              %strong 命中的Key:
+              - if item[:match_key]
+                - item[:match_key].split(' ').each do |word|
+                  %span.label.label-important= word
+          .span7
+            .lily-block-title
+              %h3 调试信息
+            %table.table.table-striped
+              %tr
+                %td{:width=>100}
+                  %strong Url
+                %td= item[:url]
+              %tr
+                %td{:width=>100}
+                  %strong Trim_Title
+                %td= item[:title]
+              %tr
+                %td{:width=>100}
+                  %strong Aliguess_Keywords
+                %td
+                  - item[:aliguess_keywords].each do |word|
+                    %span.label.label-info= word
+              %tr
+                %td{:width=>100}
+                  %strong Valid_Keywords
+                %td
+                  - item[:valid_keywords].each do |word|
+                    %span.label.label-info= word
+

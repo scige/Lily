@@ -3,5 +3,6 @@
     .container
       .nav-collapse.collapse
         %ul.nav
-          %li.active= link_to "智能配图 Demo", root_path
+          %li{:class => (action_name=="index"?"active":nil)}= link_to "智能配图 Demo", root_path
+          %li{:class => (action_name=="surfer"?"active":nil)}= link_to "评测专用", "/surfer"
 

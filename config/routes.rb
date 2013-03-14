@@ -1,6 +1,8 @@
 Lily::Application.routes.draw do
   root :to => 'pictures#index'
   post '/match', to: "pictures#match"
+  get '/surfer', to: "pictures#surfer"
+  post '/batch_match', to: "pictures#batch_match"
 
   # The priority is based upon order of creation:
   # first created -> highest priority.

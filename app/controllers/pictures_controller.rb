@@ -2,8 +2,70 @@
 require 'iconv'
 
 class PicturesController < ApplicationController
+  def initialize
+    super
+    @url_keywords_hash = {}
+    File.open("data/sample.20130312") do |file|
+      file.each_line do |line|
+        parts = line.chop.split("\t")
+        if parts.size != 3
+          next
+        end
+        url = parts[0]
+        title = parts[1]
+        keywords = parts[2]
+
+        if url.empty? or title.empty? or keywords.empty?
+          next
+        end
+
+        temp_hash = {:title=>title, :keywords=>keywords}
+        @url_keywords_hash[url] = temp_hash
+      end
+    end
+  end
+
   def index
     @url = ""
+  end
+
+  def surfer
+    @url = ""
+  end
+
+  def batch_match
+    @urls = params[:urls].strip.split("\r\n")
+    @batch_match_array = []
+    @urls.each do |url|
+      temp_hash = @url_keywords_hash[url]
+      result_hash = {:url=>url, :title=>temp_hash[:title]}
+
+      words_array = temp_hash[:keywords].split
+      result_hash[:aliguess_keywords] = words_array.dup
+
+      # 按词的长度排序
+      words_array.sort! do |left, right|
+        right.length <=> left.length
+      end
+
+      result_hash[:valid_keywords] = words_array.dup
+
+      redis_kv = create_redis_kv(words_array)
+
+      match_key = ""
+      match_oss = "default.jpg"
+      redis_kv.each do |item|
+        if item[1]
+          match_key = item[0]
+          match_oss = "http://recimg.cdn.aliyuncs.com/" + item[1]
+          break
+        end
+      end
+
+      result_hash[:match_key] = match_key
+      result_hash[:match_oss] = match_oss
+      @batch_match_array << result_hash
+    end
   end
 
   def match
@@ -51,9 +113,6 @@ class PicturesController < ApplicationController
 
     @aliguess_keywords = words_array.dup
 
-    redis = Redis.new
-    @redis_kv = []
-
     # 按字母序排序
     #words_array.sort!
 
@@ -68,37 +127,8 @@ class PicturesController < ApplicationController
 
     @valid_keywords = words_array.dup
 
-    if words_array.length == 3
-      redis_key = words_array.join(" ")
-      @redis_kv << [redis_key, redis.get(redis_key)]
+    @redis_kv = create_redis_kv(words_array)
 
-      redis_key = words_array[0] + " " + words_array[1]
-      @redis_kv << [redis_key, redis.get(redis_key)]
-      redis_key = words_array[0] + " " + words_array[2]
-      @redis_kv << [redis_key, redis.get(redis_key)]
-      redis_key = words_array[1] + " " + words_array[2]
-      @redis_kv << [redis_key, redis.get(redis_key)]
-
-      redis_key = words_array[0]
-      @redis_kv << [redis_key, redis.get(redis_key)]
-      redis_key = words_array[1]
-      @redis_kv << [redis_key, redis.get(redis_key)]
-      redis_key = words_array[2]
-      @redis_kv << [redis_key, redis.get(redis_key)]
-    elsif words_array.length == 2
-      redis_key = words_array.join(" ")
-      @redis_kv << [redis_key, redis.get(redis_key)]
-
-      redis_key = words_array[0]
-      @redis_kv << [redis_key, redis.get(redis_key)]
-      redis_key = words_array[1]
-      @redis_kv << [redis_key, redis.get(redis_key)]
-    else
-      redis_key = words_array[0]
-      @redis_kv << [redis_key, redis.get(redis_key)]
-    end
-
-    @oss_url = ""
     @match_oss = "default.jpg"
     @redis_kv.each do |item|
       if item[1]
@@ -110,6 +140,41 @@ class PicturesController < ApplicationController
   end
 
   private
+
+  def create_redis_kv(words_array)
+    redis = Redis.new
+    redis_kv = []
+    if words_array.length == 3
+      redis_key = words_array.join(" ")
+      redis_kv << [redis_key, redis.get(redis_key)]
+
+      redis_key = words_array[0] + " " + words_array[1]
+      redis_kv << [redis_key, redis.get(redis_key)]
+      redis_key = words_array[0] + " " + words_array[2]
+      redis_kv << [redis_key, redis.get(redis_key)]
+      redis_key = words_array[1] + " " + words_array[2]
+      redis_kv << [redis_key, redis.get(redis_key)]
+
+      redis_key = words_array[0]
+      redis_kv << [redis_key, redis.get(redis_key)]
+      redis_key = words_array[1]
+      redis_kv << [redis_key, redis.get(redis_key)]
+      redis_key = words_array[2]
+      redis_kv << [redis_key, redis.get(redis_key)]
+    elsif words_array.length == 2
+      redis_key = words_array.join(" ")
+      redis_kv << [redis_key, redis.get(redis_key)]
+
+      redis_key = words_array[0]
+      redis_kv << [redis_key, redis.get(redis_key)]
+      redis_key = words_array[1]
+      redis_kv << [redis_key, redis.get(redis_key)]
+    else
+      redis_key = words_array[0]
+      redis_kv << [redis_key, redis.get(redis_key)]
+    end
+    return redis_kv
+  end
 
   def get_charset(page)
     #binding.pry
@@ -136,7 +201,7 @@ class PicturesController < ApplicationController
 
   def get_title(page)
     #binding.pry
-    page =~ /<[Tt]itle.*?>.*?<\/[Tt]itle>/
+    page =~ /<title.*?>.*?<\/title>/i
     html_title = $&
     if !html_title
       return ""
