@@ -2,6 +2,7 @@ $(function(){
   $("#reset-button").click(function(){
     $("#url").val("");
     $("#title").val("");
+    $("#urls").val("");
   });
 
   $("#url").click(function(){
