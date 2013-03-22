@@ -155,32 +155,32 @@ class PicturesController < ApplicationController
     redis_kv = []
     if words_array.length == 3
       redis_key = words_array.join(" ")
-      redis_kv << [redis_key, redis.get(redis_key)]
+      redis_kv << [redis_key, redis.hget(redis_key, "oss")]
 
       redis_key = words_array[0] + " " + words_array[1]
-      redis_kv << [redis_key, redis.get(redis_key)]
+      redis_kv << [redis_key, redis.hget(redis_key, "oss")]
       redis_key = words_array[0] + " " + words_array[2]
-      redis_kv << [redis_key, redis.get(redis_key)]
+      redis_kv << [redis_key, redis.hget(redis_key, "oss")]
       redis_key = words_array[1] + " " + words_array[2]
-      redis_kv << [redis_key, redis.get(redis_key)]
+      redis_kv << [redis_key, redis.hget(redis_key, "oss")]
 
       redis_key = words_array[0]
-      redis_kv << [redis_key, redis.get(redis_key)]
+      redis_kv << [redis_key, redis.hget(redis_key, "oss")]
       redis_key = words_array[1]
-      redis_kv << [redis_key, redis.get(redis_key)]
+      redis_kv << [redis_key, redis.hget(redis_key, "oss")]
       redis_key = words_array[2]
-      redis_kv << [redis_key, redis.get(redis_key)]
+      redis_kv << [redis_key, redis.hget(redis_key, "oss")]
     elsif words_array.length == 2
       redis_key = words_array.join(" ")
-      redis_kv << [redis_key, redis.get(redis_key)]
+      redis_kv << [redis_key, redis.hget(redis_key, "oss")]
 
       redis_key = words_array[0]
-      redis_kv << [redis_key, redis.get(redis_key)]
+      redis_kv << [redis_key, redis.hget(redis_key, "oss")]
       redis_key = words_array[1]
-      redis_kv << [redis_key, redis.get(redis_key)]
+      redis_kv << [redis_key, redis.hget(redis_key, "oss")]
     else
       redis_key = words_array[0]
-      redis_kv << [redis_key, redis.get(redis_key)]
+      redis_kv << [redis_key, redis.hget(redis_key, "oss")]
     end
     return redis_kv
   end
