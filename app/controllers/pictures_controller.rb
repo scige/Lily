@@ -52,9 +52,9 @@ class PicturesController < ApplicationController
       words_array = temp_hash[:keywords].split
       result_hash[:aliguess_keywords] = words_array.dup
 
-      # 按词的长度排序
+      # 第一维度按词的长度排序，第二为维度按字母序排序
       words_array.sort! do |left, right|
-        right.length <=> left.length
+        (right.length <=> left.length).nonzero? || (right <=> left)
       end
 
       result_hash[:valid_keywords] = words_array.dup
@@ -122,12 +122,9 @@ class PicturesController < ApplicationController
 
     @aliguess_keywords = words_array.dup
 
-    # 按字母序排序
-    #words_array.sort!
-
-    # 按词的长度排序
+    # 第一维度按词的长度排序，第二为维度按字母序排序
     words_array.sort! do |left, right|
-      right.length <=> left.length
+      (right.length <=> left.length).nonzero? || (right <=> left)
     end
 
     #words_array.delete_if do |word|
