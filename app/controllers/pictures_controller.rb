@@ -87,15 +87,20 @@ class PicturesController < ApplicationController
       charset = get_charset(@page)
       @page = Iconv.conv('UTF-8//IGNORE', charset, @page)
 
-      @article_title = RestClient.post "http://10.230.225.18:4567/", :url=>@url
-      @article_title = Iconv.conv('UTF-8//IGNORE', 'UTF-8//IGNORE', @article_title)
+      @use_title = ""
+      if @input_title.empty?
+        @article_title = RestClient.post "http://10.230.225.18:4567/", :url=>@url
+        @article_title = Iconv.conv('UTF-8//IGNORE', 'UTF-8//IGNORE', @article_title)
 
-      @html_title = get_title(@page)
+        @html_title = get_title(@page)
 
-      if @article_title and !@article_title.empty?
-        @use_title = @article_title
-      elsif @html_title and !@html_title.empty?
-        @use_title = @html_title
+        if @article_title and !@article_title.empty?
+          @use_title = @article_title
+        elsif @html_title and !@html_title.empty?
+          @use_title = @html_title
+        else
+          @use_title = @input_title
+        end
       else
         @use_title = @input_title
       end
@@ -148,7 +153,7 @@ class PicturesController < ApplicationController
   private
 
   def create_redis_kv(words_array)
-    redis = Redis.new
+    redis = Redis.new(:port=>8378)
     redis_kv = []
     if words_array.length == 3
       redis_key = words_array.join(" ")
