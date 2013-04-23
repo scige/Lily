@@ -153,7 +153,7 @@ class PicturesController < ApplicationController
   private
 
   def create_redis_kv(words_array)
-    redis = Redis.new(:port=>8378)
+    redis = Redis.new(:host=>"10.206.120.13", :port=>8376)
     redis_kv = []
     if words_array.length == 3
       redis_key = words_array.join(" ")

@@ -31,7 +31,7 @@ group :development, :test do
   gem 'thin'
 end
 
-gem 'jquery-rails'
+gem 'jquery-rails', '~> 2.1.4'
 
 #gem 'bootstrap-sass', '~> 2.3.0.1'
 gem 'bootstrap-sass', '~> 2.2.2.0'
