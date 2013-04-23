@@ -5,24 +5,24 @@ class PicturesController < ApplicationController
   def initialize
     super
     @url_keywords_hash = {}
-    File.open("data/sample.20130312") do |file|
-      file.each_line do |line|
-        parts = line.chop.split("\t")
-        if parts.size != 3
-          next
-        end
-        url = parts[0]
-        title = parts[1]
-        keywords = parts[2]
+    #File.open("data/sample.20130312") do |file|
+    #  file.each_line do |line|
+    #    parts = line.chop.split("\t")
+    #    if parts.size != 3
+    #      next
+    #    end
+    #    url = parts[0]
+    #    title = parts[1]
+    #    keywords = parts[2]
 
-        if url.empty? or title.empty? or keywords.empty?
-          next
-        end
+    #    if url.empty? or title.empty? or keywords.empty?
+    #      next
+    #    end
 
-        temp_hash = {:title=>title, :keywords=>keywords}
-        @url_keywords_hash[url] = temp_hash
-      end
-    end
+    #    temp_hash = {:title=>title, :keywords=>keywords}
+    #    @url_keywords_hash[url] = temp_hash
+    #  end
+    #end
   end
 
   def index
@@ -150,10 +150,24 @@ class PicturesController < ApplicationController
     end
   end
 
+  def remove
+    @redis_key = params[:key]
+    redis_address = ["127.0.0.1"]
+    redis_address.each do |ip|
+      redis = Redis.new(:host=>ip, :port=>8378)
+      redis.del(@redis_key)
+    end
+
+    respond_to do |format|
+      format.js {render :layout => false}
+    end
+  end
+
   private
 
   def create_redis_kv(words_array)
-    redis = Redis.new(:host=>"10.206.120.13", :port=>8376)
+    redis = Redis.new(:port=>8378)
+    #redis = Redis.new(:host=>"10.206.120.13", :port=>8376)
     redis_kv = []
     if words_array.length == 3
       redis_key = words_array.join(" ")

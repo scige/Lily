@@ -3,6 +3,7 @@ Lily::Application.routes.draw do
   post '/match', to: "pictures#match"
   get '/surfer', to: "pictures#surfer"
   post '/batch_match', to: "pictures#batch_match"
+  match '/remove/:key', :controller=>'pictures', :action=>'remove'
 
   # The priority is based upon order of creation:
   # first created -> highest priority.

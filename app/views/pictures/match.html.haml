@@ -16,7 +16,7 @@
             - if @match_key
               - @match_key.split(' ').each do |word|
                 %span.label.label-important= word
-        .span7
+        .span8
           .lily-block-title
             %h3 候选图片
           %table.table.table-striped
@@ -24,6 +24,7 @@
               %th{:width=>200} key
               %th{:width=>400} oss
               %th{:width=>200} picture
+              %th{:width=>200} operation
       
             - @redis_kv.each do |item|
               %tr
@@ -38,6 +39,9 @@
                 %td= item[1]
                 %td
                   = image_tag "http://recimg.cdn.aliyuncs.com/#{item[1]}", :width=>"32"
+                %td
+                  - if item[1]
+                    = link_to "删除", "/remove/#{item[0]}", :data => { :confirm => 'Are you sure?' }, :remote=>true, :class=>"btn btn-small btn-danger"
 
           .lily-block-title
             %h3 调试信息
